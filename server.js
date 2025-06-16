@@ -21,6 +21,7 @@ const config = {
   database: process.env.DB_NAME,
   options: {
     encrypt: true,
+    trustServerCertificate: true,
   },
 };
 
@@ -31,6 +32,33 @@ app.get("/dados", async (req, res) => {
     res.json(result.recordset);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/adduser", async (req, res) => {
+  const {
+    idusuario,
+    apelido,
+    datanasc,
+    nome,
+    sobrenome,
+    descricao,
+    email,
+    cpf,
+    senha,
+    fotoperfil,
+  } = req.body;
+
+  try {
+    await sql.connect(config);
+    const result = await sql.query`
+      INSERT INTO Usuarios (IdUsuario, Apelido, DataNasc, Nome, Sobrenome, Descricao, Email, CPF, Senha, FotoPerfil)
+      VALUES (${idusuario}, ${apelido}, ${datanasc}, ${nome}, ${sobrenome}, ${descricao}, ${email}, ${cpf}, ${senha}, ${fotoperfil})`;
+
+    res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+  } catch (err) {
+    console.error("Erro ao cadastrar:", err);
+    res.status(500).json({ error: "Erro ao cadastrar usuário." });
   }
 });
 
