@@ -8,11 +8,7 @@ const app = express();
 // ✅ CORS habilitado apenas para o front-end local do Expo
 app.use(
   cors({
-    origin: [
-      "http://localhost:19006", // Expo Web
-      "http://localhost:8081", // App Web ou outro ambiente local
-      "http://192.168.15.48:19006", // se acessar pelo IP
-    ],
+    origin: "*",
   })
 );
 
