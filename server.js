@@ -37,7 +37,6 @@ app.get("/dados", async (req, res) => {
 
 app.post("/adduser", async (req, res) => {
   const {
-    idusuario,
     apelido,
     datanasc,
     nome,
@@ -51,9 +50,15 @@ app.post("/adduser", async (req, res) => {
 
   try {
     await sql.connect(config);
+
+    const lastuser =
+      await sql.query`SELECT TOP 1 IdUsuario FROM Usuarios ORDER BY IdUsuario DESC`;
+
     const result = await sql.query`
       INSERT INTO Usuarios (IdUsuario, Apelido, DataNasc, Nome, Sobrenome, Descricao, Email, CPF, Senha, FotoPerfil)
-      VALUES (${idusuario}, ${apelido}, ${datanasc}, ${nome}, ${sobrenome}, ${descricao}, ${email}, ${cpf}, ${senha}, ${fotoperfil})`;
+      VALUES (${
+        lastuser.recordset[0].IdUsuario + 1
+      }, ${apelido}, ${datanasc}, ${nome}, ${sobrenome}, ${descricao}, ${email}, ${cpf}, ${senha}, ${fotoperfil})`;
 
     res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
   } catch (err) {
