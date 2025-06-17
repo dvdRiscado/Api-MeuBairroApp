@@ -46,7 +46,7 @@ app.get("/dados", async (req, res) => {
 });
 
 // Rota POST para adicionar um usuário
-app.post("/users", async (req, res) => {
+app.post("/adduser", async (req, res) => {
   const {
     apelido,
     datanasc,
@@ -73,19 +73,21 @@ app.post("/users", async (req, res) => {
 
     await sql.query`
       INSERT INTO USUARIO (
-        Apelido, DataNasc, Nome, Sobrenome, Descricao,
+        IdUsuario, Apelido, DataNasc, Nome, Sobrenome, Descricao,
         Email, CPF, Senha, FotoPerfil
       )
       VALUES (
-        ${apelido}, ${datanasc}, ${nome}, ${sobrenome}, ${descricao},
-        ${email}, ${cpf}, ${senha}, ${bufferImagem}
+        (SELECT ISNULL(MAX(IdUsuario), 0) + 1 FROM USUARIO), ${apelido}, ${datanasc}, ${nome}, ${sobrenome}, ${descricao},
+        ${email}, ${cpf}, ${senha}, CONVERT(VARBINARY(MAX), ${bufferImagem})
       )
     `;
 
     res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
   } catch (err) {
     console.error("Erro ao cadastrar:", err);
-    res.status(500).json({ error: "Erro ao cadastrar usuário." });
+    res
+      .status(500)
+      .json({ error: "Erro ao cadastrar usuário. - " + err.message });
   }
 });
 
